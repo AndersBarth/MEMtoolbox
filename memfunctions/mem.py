@@ -4,6 +4,7 @@ from cvxopt import matrix, solvers
 from numba import jit
 
 solvers.options['show_progress'] = False
+solvers.options['maxiters'] = 200
 
 
 # convert amplitude to probabily density function
@@ -48,7 +49,7 @@ def kernel_calculation(x, data, kernel_function, param_range):
     F_R = ndarray(shape=(len(x), len(param_range)))
     # Model Kernel calculation
     for (i, R) in enumerate(param_range):
-        F_R[:, i] = kernel_function(R)*sum(data)
+        F_R[:, i] = kernel_function(R)
 
     # Calculate chi2 decomposition:
     v = data
@@ -61,7 +62,7 @@ def kernel_calculation(x, data, kernel_function, param_range):
 
 
 # MEM regularization
-def solve_MEM(c_R, q_R, H_R, mR, mu_min=0.01, mu_max=100, n_mu=100, niter=50,
+def solve_MEM(c_R, q_R, H_R, mR, mu_min=0.001, mu_max=1, n_mu=100, niter=50,
               sel_i=0):
     muMrange = logspace(log10(mu_min), log10(mu_max), n_mu)
     if sel_i != 0:
@@ -82,7 +83,7 @@ def solve_MEM(c_R, q_R, H_R, mR, mu_min=0.01, mu_max=100, n_mu=100, niter=50,
         d = medelta(pm, l, q_R, H_R)
         dMrange[i, j] = d
 
-        while (d > 0.001) and j < niter:
+        while (d > 0.01) and j < niter:
 
             sol_me = solvers.qp(matrix(H_R + 2.0*mu*D),
                                 matrix(q_R + mu*(l-1.0)),
@@ -116,9 +117,9 @@ def solve_noreg(c_R, q_R, H_R):
 
 
 # Tikhonov regularization
-def solve_Tik(c_R, q_R, H_R, mu_min=0.1, mu_max=100, n_mu=100):
+def solve_Tik(c_R, q_R, H_R, mu_min=0.01, mu_max=100, n_mu=100):
     # Scan regularization levels mu
-    muTrange = logspace(log10(0.1), log10(100), 100)
+    muTrange = logspace(log10(mu_min), log10(mu_max), n_mu)
     nTrange = zeros(muTrange.size)
     chiTrange = zeros(muTrange.size)
     pTdist = zeros([muTrange.size, q_R.size])

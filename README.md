@@ -15,7 +15,7 @@ Vinogradov, S. A., & Wilson, D. F. (2000). Recursive Maximum Entropy Algorithm a
 See the Jupyer notebooks for exemplary inference of the distribution of 
 fluorescence lifetime from fluorescence decays obtained by
 time-correlated single photon couting (TCSPC), or the interdye distance distribution from
-colocalization distances obtained from fluorescence imaging.
+colocalization distances obtained from fluorescence imaging (as in cSTED).
 
 For other use cases, it is only required to define a custom kernel function.
 All other steps of the workflow remain unchanged.
